@@ -253,24 +253,21 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1920, &quot;height&quot;: 1080}}">
 class Component extends DCLogic {
-  state = { idx: 0, refreshSecs: 23*60 + 42 };
+  /* ─────────────────────────────────────────────────────────────────
+   *  Data flow
+   *  ─────────
+   *  On mount, fetch ./data.json and load it into state. Until that
+   *  resolves (and if it ever fails), the embedded fallback below is
+   *  used so the dashboard always renders something sensible. Edit
+   *  data.json each week — this file should not need to change.
+   * ───────────────────────────────────────────────────────────────── */
 
-  componentDidMount() {
-    this._cycle = setInterval(() => {
-      this.setState(s => ({ idx: (s.idx + 1) % this.schemes().length }));
-    }, 10000);
-    this._tick = setInterval(() => {
-      this.setState(s => ({ refreshSecs: s.refreshSecs > 0 ? s.refreshSecs - 1 : 15*60 }));
-    }, 1000);
-  }
-  componentWillUnmount() {
-    clearInterval(this._cycle);
-    clearInterval(this._tick);
-  }
+  state = {
+    idx: 0,
+    refreshSecs: 23*60 + 42,
 
-  schemes() {
-    // Today: 15 June 2026
-    return [
+    // Embedded fallback — used if data.json is missing or unreadable.
+    schemes: [
       { code:'BB1674-1', name:'Milne Graden Footbridge', lead:'Michael Pach', initials:'MP', sector:'Footbridge',
         start:'2026-01-15', plannedEnd:'2026-09-30', forecastEnd:'2026-10-15',
         slice:72000, actualToDate:46800, pct:0.62, rag:'Green',
@@ -295,11 +292,54 @@ class Component extends DCLogic {
         start:'2026-05-15', plannedEnd:'2026-12-15', forecastEnd:'2026-12-20',
         slice:68000, actualToDate:4900, pct:0.08, rag:'Green',
         schedVarDays:5, spendVarGbp:300 },
-    ];
+    ],
+    pipelineGbp: 3310000,
+    pipelineWeighted: 1471000,
+    updatedTime: '14:00',
+    updatedDate: 'Mon 15 Jun 2026',
+    ticker: 'Hedon Bridge commenced this week with Michael · Duke of Northumberland watch-list: Broom Lane RAMS in review · Daresbury TWD critical path on plan',
+    today: new Date(2026, 5, 15),
+    dataSource: 'embedded',
+  };
+
+  componentDidMount() {
+    this._cycle = setInterval(() => {
+      this.setState(s => ({ idx: (s.idx + 1) % Math.max(1, s.schemes.length) }));
+    }, 10000);
+    this._tick = setInterval(() => {
+      this.setState(s => ({ refreshSecs: s.refreshSecs > 0 ? s.refreshSecs - 1 : 15*60 }));
+    }, 1000);
+
+    // Pull live data from data.json. Falls back silently to embedded data on failure.
+    fetch('./data.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : Promise.reject('data.json HTTP ' + r.status))
+      .then(d => {
+        this.setState(prev => {
+          const newSchemes = (Array.isArray(d.live_schemes) && d.live_schemes.length) ? d.live_schemes : prev.schemes;
+          return {
+            schemes: newSchemes,
+            idx: prev.idx >= newSchemes.length ? 0 : prev.idx,
+            pipelineGbp:      typeof d.pipeline_gbp          === 'number' ? d.pipeline_gbp          : prev.pipelineGbp,
+            pipelineWeighted: typeof d.pipeline_weighted_gbp === 'number' ? d.pipeline_weighted_gbp : prev.pipelineWeighted,
+            updatedTime:      typeof d.updated_time          === 'string' ? d.updated_time          : prev.updatedTime,
+            updatedDate:      typeof d.updated_date          === 'string' ? d.updated_date          : prev.updatedDate,
+            ticker:           typeof d.ticker                === 'string' ? d.ticker                : prev.ticker,
+            today:            d.today ? new Date(d.today) : prev.today,
+            dataSource:       'data.json',
+          };
+        });
+      })
+      .catch(err => console.warn('[dashboard] using embedded fallback —', err));
+  }
+  componentWillUnmount() {
+    clearInterval(this._cycle);
+    clearInterval(this._tick);
   }
 
+  schemes() { return this.state.schemes; }
+
   RAG = { Green:'#3FA76A', Amber:'#E0A02B', Red:'#C9472B' };
-  TODAY = new Date(2026, 5, 15); // June 15 2026
+  get TODAY() { return this.state.today; }
 
   fmtMoney(n) { return Math.round(n).toLocaleString('en-GB'); }
   fmtMoneyAxis(n) {
@@ -648,8 +688,8 @@ class Component extends DCLogic {
     const liveCount  = schemes.length;
     const liveBacklog = schemes.reduce((s,x)=>s+x.slice, 0);
 
-    const pipelineGbp = 3310000;
-    const pipelineWeighted = 1471000;
+    const pipelineGbp = this.state.pipelineGbp;
+    const pipelineWeighted = this.state.pipelineWeighted;
 
     // ribbon cards
     const ribbonCards = schemes.map((s, i) => ({
@@ -675,8 +715,8 @@ class Component extends DCLogic {
 
     return {
       // header
-      updatedTime: '14:00',
-      updatedDate: 'Mon 15 Jun 2026',
+      updatedTime: this.state.updatedTime,
+      updatedDate: this.state.updatedDate,
 
       // KPI
       greenCount, amberCount, redCount, liveCount,
@@ -704,7 +744,7 @@ class Component extends DCLogic {
       cycleIndexFmt: String(this.state.idx + 1).padStart(2,'0'),
 
       // footer
-      ticker: 'Hedon Bridge commenced this week with Michael · Duke of Northumberland watch-list: Broom Lane RAMS in review · Daresbury TWD critical path on plan',
+      ticker: this.state.ticker,
       nextRefresh,
     };
   }
