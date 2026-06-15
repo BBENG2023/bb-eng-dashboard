@@ -270,27 +270,27 @@ class Component extends DCLogic {
     schemes: [
       { code:'BB1674-1', name:'Milne Graden Footbridge', lead:'Michael Pach', initials:'MP', sector:'Footbridge',
         start:'2026-01-15', plannedEnd:'2026-09-30', forecastEnd:'2026-10-15',
-        slice:72000, actualToDate:46800, pct:0.62, rag:'Green',
+        slice:72000, actualToDate:46800, supplierCommitted:6000, pct:0.62, rag:'Green',
         schedVarDays:15, spendVarGbp:1200 },
       { code:'BB1740', name:'Daresbury Sci Park Link Bridge', lead:'Adrian Brown', initials:'AB', sector:'Highway',
         start:'2026-02-01', plannedEnd:'2026-10-30', forecastEnd:'2026-11-15',
-        slice:95000, actualToDate:39800, pct:0.41, rag:'Green',
+        slice:95000, actualToDate:39800, supplierCommitted:8000, pct:0.41, rag:'Green',
         schedVarDays:16, spendVarGbp:-1800 },
       { code:'BB1777', name:'Duke of Northumberland Crossing', lead:'Matt Collins', initials:'MC', sector:'Highway',
         start:'2025-10-01', plannedEnd:'2026-12-20', forecastEnd:'2027-02-28',
-        slice:240000, actualToDate:98400, pct:0.35, rag:'Amber',
+        slice:240000, actualToDate:98400, supplierCommitted:28000, pct:0.35, rag:'Amber',
         schedVarDays:70, spendVarGbp:-4200 },
       { code:'BB1812', name:'Leominster Town Centre Bridge', lead:'Michael Pach', initials:'MP', sector:'Highway',
         start:'2025-11-15', plannedEnd:'2026-09-15', forecastEnd:'2026-09-30',
-        slice:145000, actualToDate:118900, pct:0.78, rag:'Green',
+        slice:145000, actualToDate:118900, supplierCommitted:15000, pct:0.78, rag:'Green',
         schedVarDays:15, spendVarGbp:2400 },
       { code:'BB1829', name:'Loch Kemp Hydro Access Bridge', lead:'Stuart Gray', initials:'SG', sector:'Marine',
         start:'2026-03-01', plannedEnd:'2026-11-30', forecastEnd:'2026-12-15',
-        slice:115000, actualToDate:28600, pct:0.28, rag:'Green',
+        slice:115000, actualToDate:28600, supplierCommitted:14000, pct:0.28, rag:'Green',
         schedVarDays:15, spendVarGbp:-900 },
       { code:'Q007510', name:'Hedon Bridge Refurbishment', lead:'Michael Pach', initials:'MP', sector:'Refurb',
         start:'2026-05-15', plannedEnd:'2026-12-15', forecastEnd:'2026-12-20',
-        slice:68000, actualToDate:4900, pct:0.08, rag:'Green',
+        slice:68000, actualToDate:4900, supplierCommitted:1500, pct:0.08, rag:'Green',
         schedVarDays:5, spendVarGbp:300 },
     ],
     pipelineGbp: 3310000,
@@ -341,6 +341,12 @@ class Component extends DCLogic {
   RAG = { Green:'#3FA76A', Amber:'#E0A02B', Red:'#C9472B' };
   get TODAY() { return this.state.today; }
 
+  // Total spend = internal (timesheets × rates) + committed supplier (POs raised).
+  // Suppliers are absorbed in the slice on this business model, so they sit on the
+  // same chart line as internal spend. Update one or the other in data.json and the
+  // dashboard shows the combined picture.
+  totalActual(s) { return s.actualToDate + (s.supplierCommitted || 0); }
+
   fmtMoney(n) { return Math.round(n).toLocaleString('en-GB'); }
   fmtMoneyAxis(n) {
     if (n >= 1e6) return '£' + (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
@@ -375,29 +381,30 @@ class Component extends DCLogic {
     return points;
   }
 
-  // Actual curve from start → today, ending at actualToDate.
+  // Actual curve from start → today, ending at total (internal + supplier).
   actualCurve(s) {
     const start = new Date(s.start);
     const months = Math.max(1, (this.TODAY.getFullYear() - start.getFullYear()) * 12 + (this.TODAY.getMonth() - start.getMonth()));
+    const total = this.totalActual(s);
     const points = [];
-    // S-shape ramp toward actualToDate; slight under/over per scheme
+    // S-shape ramp toward total; slight under/over per scheme
     for (let i = 0; i <= months; i++) {
       const t = i / months;
       // smoother S
       const eased = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
-      const cum = eased * s.actualToDate;
+      const cum = eased * total;
       const d = new Date(start.getFullYear(), start.getMonth()+i, 1);
       points.push({ date:d, cum });
     }
     // Anchor end exactly to today
-    points.push({ date:new Date(this.TODAY), cum:s.actualToDate });
+    points.push({ date:new Date(this.TODAY), cum: total });
     return points;
   }
 
   // Forecast: straight line from today → forecast end at slice value
   forecastSegment(s) {
     return [
-      { date:new Date(this.TODAY), cum:s.actualToDate },
+      { date:new Date(this.TODAY), cum: this.totalActual(s) },
       { date:new Date(s.forecastEnd), cum:s.slice }
     ];
   }
@@ -430,9 +437,9 @@ class Component extends DCLogic {
       }
       out.push({ pct, cum:actual });
     }
-    // ensure last point matches actualToDate / pct
+    // ensure last point matches total (internal + supplier) / pct
     if (out.length) {
-      out[out.length-1] = { pct: s.pct, cum: s.actualToDate };
+      out[out.length-1] = { pct: s.pct, cum: this.totalActual(s) };
     }
     return out;
   }
@@ -508,8 +515,8 @@ class Component extends DCLogic {
       React.createElement('rect', { x:todayX-22, y:M.t-2, width:44, height:18, rx:3, fill:'#262C53' }),
       React.createElement('text', { x:todayX, y:M.t+11, textAnchor:'middle', fontSize:10, fill:'#FFFFFF', fontWeight:700, letterSpacing:'0.08em' }, 'TODAY'),
       // current actual dot
-      React.createElement('circle', { cx:todayX, cy:y(s.actualToDate), r:5, fill:'#262C53' }),
-      React.createElement('circle', { cx:todayX, cy:y(s.actualToDate), r:9, fill:'none', stroke:'#262C53', strokeOpacity:0.25 })
+      React.createElement('circle', { cx:todayX, cy:y(this.totalActual(s)), r:5, fill:'#262C53' }),
+      React.createElement('circle', { cx:todayX, cy:y(this.totalActual(s)), r:9, fill:'none', stroke:'#262C53', strokeOpacity:0.25 })
     );
   }
 
@@ -655,7 +662,7 @@ class Component extends DCLogic {
   // ─── CP pill (Chart 2) ───
   buildCpPill(s) {
     const ideal = s.pct * s.slice;
-    const delta = s.actualToDate - ideal;
+    const delta = this.totalActual(s) - ideal;
     const pct = ideal > 0 ? delta / ideal : 0;
     const apct = Math.abs(pct);
     let color, label;

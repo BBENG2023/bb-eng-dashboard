@@ -40,8 +40,9 @@ The file structure mirrors what's on screen:
       "plannedEnd": "2026-09-30",
       "forecastEnd": "2026-10-15",
       "slice": 72000,
-      "actualToDate": 49200,
-      "pct": 0.65,
+      "actualToDate": 46800,
+      "supplierCommitted": 6000,
+      "pct": 0.62,
       "rag": "Green",
       "schedVarDays": 15,
       "spendVarGbp": 1200
@@ -55,7 +56,7 @@ The fields you'll typically change each week:
 
 - `updated_time`, `updated_date`, `today` — bump to current
 - `ticker` — fresh narrative line; up to three items separated by ` · `
-- For each scheme: `actualToDate`, `pct`, `rag`, `forecastEnd`, `schedVarDays`, `spendVarGbp`
+- For each scheme: `actualToDate`, `supplierCommitted`, `pct`, `rag`, `forecastEnd`, `schedVarDays`, `spendVarGbp`
 
 The fields that rarely change:
 
@@ -83,7 +84,8 @@ The fields that rarely change:
 | `plannedEnd` | Planned end date | ISO date "YYYY-MM-DD" |
 | `forecastEnd` | Current forecast end date | ISO date "YYYY-MM-DD" |
 | `slice` | BB-ENG slice (£) — the engineering deliverable value | Integer £ |
-| `actualToDate` | Cumulative actual spend to today | Integer £ |
+| `actualToDate` | Cumulative internal actual spend to today (timesheets × rates) | Integer £ |
+| `supplierCommitted` | Cumulative committed supplier costs (POs raised) absorbed in slice | Integer £ |
 | `pct` | PM-assessed % complete | Decimal 0–1 (e.g. 0.65 for 65%) |
 | `rag` | Status | "Green" \| "Amber" \| "Red" |
 | `schedVarDays` | Schedule variance | Integer days (positive = late) |
