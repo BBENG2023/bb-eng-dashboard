@@ -1,0 +1,1040 @@
+{
+  "README": [
+    null,
+    {
+      "A": "BB-ENG Dashboard — Data Master"
+    },
+    {
+      "A": "Engineering overlay. Joined with Preconstruction Tracker + Timesheets by Power Automate to feed the dashboard."
+    },
+    {},
+    {
+      "A": "Architecture"
+    },
+    {
+      "A": "Preconstruction Tracker",
+      "B": "Authoritative commercial record (maintained by the business, weekly). Source for: contract value, customer, pipeline status, open/closed, conversion date."
+    },
+    {
+      "A": "BB-ENG Master (this file)",
+      "B": "Engineering overlay. Source for: BB-ENG Slice (£), PM % complete, RAG override, lead engineer, sector, notes, planned spend curves."
+    },
+    {
+      "A": "Timesheets export",
+      "B": "Actual hours booked per project, refreshed weekly. Source for: cumulative spend (× team rates), hours burned this week."
+    },
+    {
+      "A": "Team Rates",
+      "B": "Charge-out rates per person. Updated annually-ish."
+    },
+    {
+      "A": "Power Automate flow",
+      "B": "Joins all of the above into a single JSON the dashboard reads, hourly during work hours."
+    },
+    {},
+    {
+      "A": "How the join works"
+    },
+    {
+      "A": "Lookup key",
+      "B": "Project Code in this file matches Project Ref in the Preconstruction Tracker."
+    },
+    {
+      "A": "Per scheme on the dashboard",
+      "B": "Pull Customer, Pipeline Status, Open/Closed from Tracker. Pull % complete, RAG, lead, notes, BB-ENG Slice (£) from this file. Pull spend-to-date from Timesheets × Team Rates."
+    },
+    {
+      "A": "Pipeline (£) headline",
+      "B": "Sum of Tracker.Value where Open/Closed = Open AND Pipeline Status ≠ Secured."
+    },
+    {
+      "A": "Live Backlog (£) headline",
+      "B": "Sum of Master.BB-ENG Slice (£) where Master.Status = Live."
+    },
+    {
+      "A": "Archive count",
+      "B": "Count of Master.Status = Archived (or Tracker rows where Open/Closed = Closed)."
+    },
+    {},
+    {
+      "A": "Sheets in this workbook"
+    },
+    {
+      "A": "1. Project Master",
+      "B": "One row per BB-ENG scheme (Live, Pipeline, Archived). The engineering overlay."
+    },
+    {
+      "A": "2. Planned Spend",
+      "B": "Monthly cumulative planned spend per Live scheme. Drives the planned S-curve on Chart 1."
+    },
+    {
+      "A": "3. Team Rates",
+      "B": "Charge-out rates per team member. Converts booked hours to £ spent."
+    },
+    {
+      "A": "4. Pipeline",
+      "B": "Opportunities not yet secured. Feeds the pipeline tile and pipeline panel."
+    },
+    {
+      "A": "5. Settings",
+      "B": "RAG thresholds, dashboard cycle timing, refresh cadence, brand tokens, file paths."
+    },
+    {},
+    {
+      "A": "Cell colour conventions"
+    },
+    {
+      "A": "Blue text (input)",
+      "B": "Values you fill in manually. Overtype freely."
+    },
+    {
+      "A": "Black text (formula)",
+      "B": "Calculated — don&apos;t overwrite."
+    },
+    {
+      "A": "RAG fills",
+      "B": "Green/Amber/Red conditional formatting on RAG column. Set RAG Override to Auto, G, A or R."
+    },
+    {},
+    {
+      "A": "BB-ENG Slice (£) — the key engineering field"
+    },
+    {
+      "A": "What it is",
+      "B": "The £ value of BB-ENG&apos;s deliverable on the scheme. Set at project award, doesn&apos;t change unless scope changes."
+    },
+    {
+      "A": "Examples",
+      "B": "Pure design / inspection / options contract = full fee value. TWD-only on a construction contract = £15–40k typical. Full design+build where BB-ENG owns design = a defined £ slice of the total contract."
+    },
+    {
+      "A": "If blank",
+      "B": "Scheme excluded from Live Backlog; flagged on dashboard for attention."
+    },
+    {},
+    {
+      "A": "To populate / maintain"
+    },
+    {
+      "A": "Step 1",
+      "B": "Project Master pre-seeded with 20 schemes. Confirm Project Codes match the Tracker."
+    },
+    {
+      "A": "Step 2",
+      "B": "Overtype BB-ENG Slice (£), Start, Planned End and Forecast End with accurate values per scheme."
+    },
+    {
+      "A": "Step 3",
+      "B": "Planned Spend curves are seeded as straight-line ramps to BB-ENG Slice. Replace with your own S-curve if you have one (typical front-loaded design profile: 20% in M1, 50% by M3, 85% by M6, 100% by M-end)."
+    },
+    {
+      "A": "Step 4",
+      "B": "RAG Override = Auto means dashboard calculates RAG. Set G/A/R to override (e.g. amber a scheme manually if you have soft intel)."
+    },
+    {
+      "A": "Step 5",
+      "B": "Save back to SharePoint with the same filename. Power Automate flow re-reads on the next cycle."
+    }
+  ],
+  "Project Master": [
+    null,
+    {
+      "A": "Project Master"
+    },
+    {
+      "A": "Engineering overlay — one row per scheme. Blue cells = input. Black = formula."
+    },
+    {
+      "A": "Project Code",
+      "B": "Project Name",
+      "C": "Lead Engineer",
+      "D": "Sector",
+      "E": "Contract Value (£)",
+      "F": "BB-ENG Slice (£)",
+      "G": "Start",
+      "H": "Planned End",
+      "I": "Forecast End",
+      "J": "% Complete",
+      "K": "RAG Override",
+      "L": "RAG",
+      "M": "Status",
+      "N": "Notes"
+    },
+    {
+      "A": "BB1674-1",
+      "B": "Milne Graden Footbridge",
+      "C": "Michael Pach",
+      "D": "Footbridge",
+      "E": "285000",
+      "F": "72000",
+      "G": "46037",
+      "H": "46295",
+      "I": "46310",
+      "J": "0.62",
+      "K": "Auto",
+      "L": "Green",
+      "M": "Live",
+      "N": "Steel arch over river; AIP submitted; detailed design in train."
+    },
+    {
+      "A": "BB1740",
+      "B": "Daresbury Sci Park Link Bridge",
+      "C": "Adrian Brown",
+      "D": "Highway",
+      "E": "680000",
+      "F": "95000",
+      "G": "46054",
+      "H": "46325",
+      "I": "46341",
+      "J": "0.41",
+      "K": "Auto",
+      "L": "Green",
+      "M": "Live",
+      "N": "Composite deck; TWD critical path; coordinating with main contractor."
+    },
+    {
+      "A": "BB1777",
+      "B": "Duke of Northumberland Crossing",
+      "C": "Matt Collins",
+      "D": "Highway",
+      "E": "2400000",
+      "F": "240000",
+      "G": "45931",
+      "H": "46376",
+      "I": "46446",
+      "J": "0.35",
+      "K": "A",
+      "L": "Amber",
+      "M": "Live",
+      "N": "Broom Lane access constraint; RAMS being reviewed; flagged amber."
+    },
+    {
+      "A": "BB1812",
+      "B": "Leominster Town Centre Bridge",
+      "C": "Michael Pach",
+      "D": "Highway",
+      "E": "1150000",
+      "F": "145000",
+      "G": "45976",
+      "H": "46280",
+      "I": "46295",
+      "J": "0.78",
+      "K": "Auto",
+      "L": "Green",
+      "M": "Live",
+      "N": "Inspection findings driving scope; client signed off variation."
+    },
+    {
+      "A": "BB1829",
+      "B": "Loch Kemp Hydro Access Bridge",
+      "C": "Stuart Gray",
+      "D": "Marine",
+      "E": "890000",
+      "F": "115000",
+      "G": "46082",
+      "H": "46356",
+      "I": "46371",
+      "J": "0.28",
+      "K": "Auto",
+      "L": "Green",
+      "M": "Live",
+      "N": "Remote site; lift planning with Adam Slicer; sequencing locked."
+    },
+    {
+      "A": "Q007510",
+      "B": "Hedon Bridge Refurbishment",
+      "C": "Michael Pach",
+      "D": "Refurb",
+      "E": "540000",
+      "F": "68000",
+      "G": "46157",
+      "H": "46371",
+      "I": "46376",
+      "J": "0.08",
+      "K": "Auto",
+      "L": "Green",
+      "M": "Live",
+      "N": "Just commenced; site visit week commencing 8 June."
+    },
+    {
+      "A": "BB1855",
+      "B": "Aire Valley Greenway Footbridge",
+      "C": "Adrian Brown",
+      "D": "Footbridge",
+      "E": "340000",
+      "F": "85000",
+      "G": "46235",
+      "H": "46507",
+      "J": "0",
+      "K": "Auto",
+      "L": "—",
+      "M": "Pipeline",
+      "N": "Secured; awaiting client kick-off."
+    },
+    {
+      "A": "BB1861",
+      "B": "M62 J24 Underbridge TWD",
+      "C": "Adrian Brown",
+      "D": "Highway",
+      "E": "180000",
+      "F": "35000",
+      "G": "46218",
+      "H": "46387",
+      "J": "0",
+      "K": "Auto",
+      "L": "—",
+      "M": "Pipeline",
+      "N": "TWD-only commission; programme tight."
+    },
+    {
+      "A": "BB1867",
+      "B": "Tyne Wear Cycle Bridge",
+      "C": "Luke Jenkins",
+      "D": "Footbridge",
+      "E": "720000",
+      "F": "120000",
+      "G": "46266",
+      "H": "46568",
+      "J": "0",
+      "K": "Auto",
+      "L": "—",
+      "M": "Pipeline",
+      "N": "Award expected July; design start September."
+    },
+    {
+      "A": "Q007612",
+      "B": "Severn Crossing Inspection",
+      "C": "James Herdman",
+      "D": "Inspection",
+      "E": "95000",
+      "F": "95000",
+      "G": "46204",
+      "H": "46295",
+      "J": "0",
+      "K": "Auto",
+      "L": "—",
+      "M": "Pipeline",
+      "N": "Pure inspection; full fee = BB-ENG slice."
+    },
+    {
+      "A": "Q007631",
+      "B": "Manchester Ship Canal Footbridge",
+      "C": "Stuart Gray",
+      "D": "Footbridge",
+      "E": "410000",
+      "F": "85000",
+      "G": "46296",
+      "H": "46538",
+      "J": "0",
+      "K": "Auto",
+      "L": "—",
+      "M": "Pipeline",
+      "N": "Tender in; outcome late June."
+    },
+    {
+      "A": "Q007644",
+      "B": "A66 Northern Trans-Pennine TWD",
+      "C": "Adrian Brown",
+      "D": "Highway",
+      "E": "220000",
+      "F": "45000",
+      "G": "46249",
+      "H": "46446",
+      "J": "0",
+      "K": "Auto",
+      "L": "—",
+      "M": "Pipeline",
+      "N": "TWD package; preferred bidder confirmed."
+    },
+    {
+      "A": "BB1551",
+      "B": "Branston Lane Footbridge",
+      "C": "Michael Pach",
+      "D": "Footbridge",
+      "E": "240000",
+      "F": "62000",
+      "G": "45717",
+      "H": "45991",
+      "I": "46001",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "Completed Dec 2025; minor snagging closed Jan."
+    },
+    {
+      "A": "BB1602",
+      "B": "Calder Vale Underbridge",
+      "C": "Matt Collins",
+      "D": "Highway",
+      "E": "980000",
+      "F": "130000",
+      "G": "45672",
+      "H": "46006",
+      "I": "46042",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "Completed Jan 2026."
+    },
+    {
+      "A": "BB1628",
+      "B": "Tweed Estuary Walkway",
+      "C": "Stuart Gray",
+      "D": "Footbridge",
+      "E": "315000",
+      "F": "78000",
+      "G": "45748",
+      "H": "46081",
+      "I": "46096",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "Completed Mar 2026."
+    },
+    {
+      "A": "BB1655",
+      "B": "Skelton Beck Bridge Refurb",
+      "C": "Luke Jenkins",
+      "D": "Refurb",
+      "E": "460000",
+      "F": "55000",
+      "G": "45689",
+      "H": "45961",
+      "I": "45981",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "Completed Nov 2025."
+    },
+    {
+      "A": "BB1683",
+      "B": "Forth Approach Inspection",
+      "C": "James Herdman",
+      "D": "Inspection",
+      "E": "78000",
+      "F": "78000",
+      "G": "45901",
+      "H": "46006",
+      "I": "46009",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "Pure inspection; report delivered Dec 2025."
+    },
+    {
+      "A": "BB1701",
+      "B": "Mersey Bend Pedestrian Bridge",
+      "C": "Michael Pach",
+      "D": "Footbridge",
+      "E": "295000",
+      "F": "74000",
+      "G": "45792",
+      "H": "46053",
+      "I": "46063",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "Completed Feb 2026."
+    },
+    {
+      "A": "BB1719",
+      "B": "Wear Valley Highway Bridge TWD",
+      "C": "Adrian Brown",
+      "D": "Highway",
+      "E": "165000",
+      "F": "32000",
+      "G": "45809",
+      "H": "45991",
+      "I": "45996",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "TWD complete; client retained for next phase."
+    },
+    {
+      "A": "BB1733",
+      "B": "Tees Crossing Marine Bridge",
+      "C": "Stuart Gray",
+      "D": "Marine",
+      "E": "1320000",
+      "F": "180000",
+      "G": "45667",
+      "H": "46112",
+      "I": "46132",
+      "J": "1",
+      "K": "Auto",
+      "L": "—",
+      "M": "Archived",
+      "N": "Completed Apr 2026; case study material."
+    },
+    null,
+    {
+      "A": "SUMMARY",
+      "D": "Live count:",
+      "E": "6",
+      "F": "Live Backlog (£):",
+      "G": "735000"
+    },
+    {
+      "D": "Pipeline count:",
+      "E": "6",
+      "F": "Pipeline Value (£):",
+      "G": "1965000"
+    },
+    {
+      "D": "Archived count:",
+      "E": "8"
+    }
+  ],
+  "Planned Spend": [
+    null,
+    {
+      "A": "Planned Spend (cumulative, £)"
+    },
+    {
+      "A": "One row per Live scheme. Cumulative £ planned by month. Drives the planned S-curve on Chart 1."
+    },
+    {
+      "A": "Project Code",
+      "B": "Project Name",
+      "C": "Jan-26",
+      "D": "Feb-26",
+      "E": "Mar-26",
+      "F": "Apr-26",
+      "G": "May-26",
+      "H": "Jun-26",
+      "I": "Jul-26",
+      "J": "Aug-26",
+      "K": "Sep-26",
+      "L": "Oct-26",
+      "M": "Nov-26",
+      "N": "Dec-26",
+      "O": "Jan-27",
+      "P": "Feb-27",
+      "Q": "Mar-27",
+      "R": "Apr-27",
+      "S": "May-27",
+      "T": "Jun-27",
+      "U": "Jul-27",
+      "V": "Aug-27",
+      "W": "Sep-27",
+      "X": "Oct-27",
+      "Y": "Nov-27",
+      "Z": "Dec-27"
+    },
+    {
+      "A": "BB1674-1",
+      "B": "Milne Graden Footbridge",
+      "C": "3600",
+      "D": "10800",
+      "E": "21600",
+      "F": "36000",
+      "G": "46800",
+      "H": "56200",
+      "I": "63400",
+      "J": "68400",
+      "K": "72000",
+      "L": "72000",
+      "M": "72000",
+      "N": "72000",
+      "O": "72000",
+      "P": "72000",
+      "Q": "72000",
+      "R": "72000",
+      "S": "72000",
+      "T": "72000",
+      "U": "72000",
+      "V": "72000",
+      "W": "72000",
+      "X": "72000",
+      "Y": "72000",
+      "Z": "72000"
+    },
+    {
+      "A": "BB1740",
+      "B": "Daresbury Sci Park Link Bridge",
+      "D": "4800",
+      "E": "14200",
+      "F": "28500",
+      "G": "47500",
+      "H": "61800",
+      "I": "74100",
+      "J": "83600",
+      "K": "90200",
+      "L": "95000",
+      "M": "95000",
+      "N": "95000",
+      "O": "95000",
+      "P": "95000",
+      "Q": "95000",
+      "R": "95000",
+      "S": "95000",
+      "T": "95000",
+      "U": "95000",
+      "V": "95000",
+      "W": "95000",
+      "X": "95000",
+      "Y": "95000",
+      "Z": "95000"
+    },
+    {
+      "A": "BB1777",
+      "B": "Duke of Northumberland Crossing",
+      "C": "61700",
+      "D": "85700",
+      "E": "113100",
+      "F": "135400",
+      "G": "156000",
+      "H": "173800",
+      "I": "190600",
+      "J": "204300",
+      "K": "216000",
+      "L": "225600",
+      "M": "233100",
+      "N": "240000",
+      "O": "240000",
+      "P": "240000",
+      "Q": "240000",
+      "R": "240000",
+      "S": "240000",
+      "T": "240000",
+      "U": "240000",
+      "V": "240000",
+      "W": "240000",
+      "X": "240000",
+      "Y": "240000",
+      "Z": "240000"
+    },
+    {
+      "A": "BB1812",
+      "B": "Leominster Town Centre Bridge",
+      "C": "34800",
+      "D": "55100",
+      "E": "76800",
+      "F": "94200",
+      "G": "109300",
+      "H": "121800",
+      "I": "131700",
+      "J": "139200",
+      "K": "145000",
+      "L": "145000",
+      "M": "145000",
+      "N": "145000",
+      "O": "145000",
+      "P": "145000",
+      "Q": "145000",
+      "R": "145000",
+      "S": "145000",
+      "T": "145000",
+      "U": "145000",
+      "V": "145000",
+      "W": "145000",
+      "X": "145000",
+      "Y": "145000",
+      "Z": "145000"
+    },
+    {
+      "A": "BB1829",
+      "B": "Loch Kemp Hydro Access Bridge",
+      "E": "5800",
+      "F": "17200",
+      "G": "34500",
+      "H": "57500",
+      "I": "74800",
+      "J": "89700",
+      "K": "101200",
+      "L": "109200",
+      "M": "115000",
+      "N": "115000",
+      "O": "115000",
+      "P": "115000",
+      "Q": "115000",
+      "R": "115000",
+      "S": "115000",
+      "T": "115000",
+      "U": "115000",
+      "V": "115000",
+      "W": "115000",
+      "X": "115000",
+      "Y": "115000",
+      "Z": "115000"
+    },
+    {
+      "A": "Q007510",
+      "B": "Hedon Bridge Refurbishment",
+      "G": "3400",
+      "H": "11700",
+      "I": "24300",
+      "J": "38400",
+      "K": "49300",
+      "L": "57900",
+      "M": "63900",
+      "N": "68000",
+      "O": "68000",
+      "P": "68000",
+      "Q": "68000",
+      "R": "68000",
+      "S": "68000",
+      "T": "68000",
+      "U": "68000",
+      "V": "68000",
+      "W": "68000",
+      "X": "68000",
+      "Y": "68000",
+      "Z": "68000"
+    }
+  ],
+  "Team Rates": [
+    null,
+    {
+      "A": "Team Rates"
+    },
+    {
+      "A": "Charge-out rates per team member. Used by Power Automate to convert booked hours to £ spent."
+    },
+    {
+      "A": "Name",
+      "B": "Role",
+      "C": "Rate (£/hr)",
+      "D": "Status"
+    },
+    {
+      "A": "Stephen Walsh",
+      "B": "Engineering Director",
+      "C": "135",
+      "D": "Active"
+    },
+    {
+      "A": "Alex Griffiths",
+      "B": "Principal Engineer",
+      "C": "115",
+      "D": "Joining Jul 2026"
+    },
+    {
+      "A": "Gareth Yates",
+      "B": "Engineering Manager",
+      "C": "105",
+      "D": "Active"
+    },
+    {
+      "A": "Michael Pach",
+      "B": "Design Engineer",
+      "C": "92",
+      "D": "Active"
+    },
+    {
+      "A": "Adrian Brown",
+      "B": "Temporary Works Designer",
+      "C": "95",
+      "D": "Active"
+    },
+    {
+      "A": "Matt Collins",
+      "B": "Senior Engineer",
+      "C": "98",
+      "D": "Active"
+    },
+    {
+      "A": "Stuart Gray",
+      "B": "Senior Engineer",
+      "C": "98",
+      "D": "Active"
+    },
+    {
+      "A": "Luke Jenkins",
+      "B": "Engineer",
+      "C": "85",
+      "D": "Active"
+    },
+    {
+      "A": "James Herdman",
+      "B": "Inspection Engineer",
+      "C": "90",
+      "D": "Active"
+    },
+    null,
+    {
+      "B": "Team average (Active only)",
+      "C": "99.75"
+    }
+  ],
+  "Pipeline": [
+    null,
+    {
+      "A": "Pipeline"
+    },
+    {
+      "A": "Opportunities not yet awarded. Feeds the pipeline tile and pipeline panel on the dashboard."
+    },
+    {
+      "A": "Opp Code",
+      "B": "Opportunity Name",
+      "C": "Customer",
+      "D": "Sector",
+      "E": "Est Value (£)",
+      "F": "Probability",
+      "G": "Expected Award",
+      "H": "Notes"
+    },
+    {
+      "A": "Q007650",
+      "B": "A55 Britannia Bridge Footway Extension",
+      "C": "Welsh Government",
+      "D": "Footbridge",
+      "E": "520000",
+      "F": "0.6",
+      "G": "46235",
+      "H": "Awaiting funding sign-off."
+    },
+    {
+      "A": "Q007658",
+      "B": "Liverpool Ship Canal Lift Bridge Refurb",
+      "C": "Peel Ports",
+      "D": "Refurb",
+      "E": "890000",
+      "F": "0.4",
+      "G": "46280",
+      "H": "Strong relationship; technical fit good."
+    },
+    {
+      "A": "Q007662",
+      "B": "Cardiff Bay Pedestrian Bridge",
+      "C": "Cardiff Council",
+      "D": "Footbridge",
+      "E": "680000",
+      "F": "0.35",
+      "G": "46296",
+      "H": "Open competition; preparing tender."
+    },
+    {
+      "A": "Q007671",
+      "B": "Edinburgh Trams Bridge TWD",
+      "C": "Bilfinger Salyer JV",
+      "D": "Rail",
+      "E": "140000",
+      "F": "0.7",
+      "G": "46233",
+      "H": "TWD specialism; warm lead."
+    },
+    {
+      "A": "Q007684",
+      "B": "Humber Estuary Inspection Programme",
+      "C": "Highways England",
+      "D": "Inspection",
+      "E": "220000",
+      "F": "0.5",
+      "G": "46295",
+      "H": "Framework call-off."
+    },
+    {
+      "A": "Q007691",
+      "B": "North York Moors Heritage Bridges x3",
+      "C": "National Park Authority",
+      "D": "Refurb",
+      "E": "385000",
+      "F": "0.45",
+      "G": "46315",
+      "H": "Heritage element; strong narrative angle."
+    },
+    {
+      "A": "Q007702",
+      "B": "Belfast Lagan Crossing Concept Design",
+      "C": "Belfast City Council",
+      "D": "Footbridge",
+      "E": "165000",
+      "F": "0.55",
+      "G": "46249",
+      "H": "Feasibility stage; route to wider scheme."
+    },
+    {
+      "A": "Q007711",
+      "B": "M1 J32-34 Smart Motorway TWD",
+      "C": "Galliford Try",
+      "D": "Highway",
+      "E": "310000",
+      "F": "0.3",
+      "G": "46327",
+      "H": "Early conversation; large potential value."
+    },
+    null,
+    {
+      "D": "Total est. value:",
+      "E": "3310000"
+    },
+    {
+      "D": "Weighted value:",
+      "E": "1471000"
+    }
+  ],
+  "Settings": [
+    null,
+    {
+      "A": "Settings"
+    },
+    {
+      "A": "Dashboard configuration. Change these here, not in the dashboard code."
+    },
+    {
+      "A": "Section",
+      "B": "Setting",
+      "C": "Value"
+    },
+    {
+      "A": "RAG Thresholds",
+      "B": "Green: combined variance below",
+      "C": "10%"
+    },
+    {
+      "A": "RAG Thresholds",
+      "B": "Amber: combined variance between",
+      "C": "10% and 20%"
+    },
+    {
+      "A": "RAG Thresholds",
+      "B": "Red: combined variance above",
+      "C": "20%"
+    },
+    {
+      "A": "RAG Logic",
+      "B": "RAG criterion",
+      "C": "Worst of (spend variance %) or (schedule variance %)"
+    },
+    {
+      "A": "RAG Logic",
+      "B": "Manual override",
+      "C": "RAG Override column in Project Master: Auto / G / A / R"
+    },
+    {
+      "A": "Dashboard Cycle",
+      "B": "Seconds per scheme on Chart 1 cycle",
+      "C": "10"
+    },
+    {
+      "A": "Dashboard Cycle",
+      "B": "Which schemes cycle",
+      "C": "All in Project Master where Status = Live"
+    },
+    {
+      "A": "Dashboard Cycle",
+      "B": "Cycle behaviour",
+      "C": "Auto-advance; loop continuously"
+    },
+    {
+      "A": "Refresh",
+      "B": "Frequency",
+      "C": "Hourly between 08:00 and 18:00 weekdays"
+    },
+    {
+      "A": "Refresh",
+      "B": "Power Automate flow name",
+      "C": "(to be set on deployment)"
+    },
+    {
+      "A": "Data Sources",
+      "B": "Preconstruction Tracker path",
+      "C": "(SharePoint URL — set on deployment)"
+    },
+    {
+      "A": "Data Sources",
+      "B": "Timesheets export path",
+      "C": "(SharePoint URL — set on deployment)"
+    },
+    {
+      "A": "Data Sources",
+      "B": "BB-ENG Master (this file)",
+      "C": "(SharePoint URL — set on deployment)"
+    },
+    {
+      "A": "Data Sources",
+      "B": "Dashboard host URL",
+      "C": "(set on deployment)"
+    },
+    {
+      "A": "Join Logic",
+      "B": "Lookup key",
+      "C": "Master.Project Code = Tracker.Project Ref"
+    },
+    {
+      "A": "Join Logic",
+      "B": "If BB-ENG Slice (£) blank",
+      "C": "Scheme excluded from Live Backlog; flagged on dashboard"
+    },
+    {
+      "A": "Display",
+      "B": "Show full £ values",
+      "C": "Yes"
+    },
+    {
+      "A": "Display",
+      "B": "Currency format",
+      "C": "£#,##0 (no decimals)"
+    },
+    {
+      "A": "Display",
+      "B": "Headline KPIs (top strip)",
+      "C": "Schemes on track (RAG split), Live Backlog (£), Pipeline (£)"
+    },
+    {
+      "A": "Display",
+      "B": "Count tiles",
+      "C": "Live count · Pipeline count · Archived count"
+    },
+    {
+      "A": "Branding",
+      "B": "Primary colour",
+      "C": "#262C53 (BB Navy)"
+    },
+    {
+      "A": "Branding",
+      "B": "Secondary colour",
+      "C": "#2F43C5 (BB Blue)"
+    },
+    {
+      "A": "Branding",
+      "B": "Accent — RAG Green",
+      "C": "#3FA76A"
+    },
+    {
+      "A": "Branding",
+      "B": "Accent — RAG Amber",
+      "C": "#E0A02B"
+    },
+    {
+      "A": "Branding",
+      "B": "Accent — RAG Red",
+      "C": "#C9472B"
+    },
+    {
+      "A": "Branding",
+      "B": "Background",
+      "C": "#F7F8FB (very light)"
+    },
+    {
+      "A": "Branding",
+      "B": "Typeface",
+      "C": "Noto Sans (system fallback: Arial, Calibri)"
+    },
+    {
+      "A": "Browser target",
+      "B": "Primary",
+      "C": "Amazon Silk on Fire Stick (TV display)"
+    },
+    {
+      "A": "Browser target",
+      "B": "Secondary",
+      "C": "Edge / Chrome on team laptops"
+    },
+    {
+      "A": "Browser target",
+      "B": "Min resolution",
+      "C": "1920 x 1080 (Full HD TV)"
+    }
+  ]
+}

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  @keyframes dashFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+</style>
+</helmet>
+<div style="width:1920px; height:1080px; background:#F7F8FB; font-family:'Noto Sans', Arial, sans-serif; color:#202124; display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box;">
+
+  <!-- ───────────────────────── HEADER ───────────────────────── -->
+  <header style="flex:none; height:72px; background:#262C53; display:flex; align-items:center; padding:0 32px; color:#FFFFFF; box-sizing:border-box; border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="display:flex; align-items:center; gap:14px; flex:1 1 0;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:32px; height:32px; border:2px solid #FFFFFF; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; letter-spacing:0.5px;">BB</div>
+        <div style="font-weight:700; font-size:13px; letter-spacing:0.18em; color:#FFFFFF; opacity:0.85;">ENGINEERING</div>
+      </div>
+      <div style="width:1px; height:24px; background:rgba(255,255,255,0.18); margin:0 8px;"></div>
+      <div style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; opacity:0.6;">Forge 44 · Irlam · Live</div>
+    </div>
+    <div style="flex:0 0 auto; font-weight:600; font-size:22px; letter-spacing:0.01em;">Engineering Project Health</div>
+    <div style="flex:1 1 0; display:flex; align-items:center; justify-content:flex-end; gap:14px;">
+      <div style="font-size:12px; color:rgba(255,255,255,0.7); font-variant-numeric:tabular-nums;">Last updated {{ updatedTime }} · {{ updatedDate }}</div>
+      <div style="display:flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid rgba(255,255,255,0.18); border-radius:999px;">
+        <div style="width:8px; height:8px; border-radius:50%; background:#3FA76A; box-shadow:0 0 0 3px rgba(63,167,106,0.18); animation:pulseDot 2.6s ease-in-out infinite;"></div>
+        <div style="font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.75);">Feed live</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ───────────────────────── MIDDLE ───────────────────────── -->
+  <main style="flex:1 1 auto; display:flex; flex-direction:column; gap:14px; padding:16px 24px; box-sizing:border-box; min-height:0;">
+
+    <!-- KPI STRIP -->
+    <section style="flex:none; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; height:148px;">
+
+      <!-- KPI A — Schemes on Track -->
+      <div style="background:#FFFFFF; border:1px solid #E6E8F0; border-radius:12px; box-shadow:0 1px 2px rgba(38,44,83,0.06); padding:18px 22px; display:flex; align-items:center; gap:20px; box-sizing:border-box;">
+        <div style="flex:none; width:110px; height:110px; position:relative;">
+          {{ donutSvg }}
+          <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; letter-spacing:0.12em; color:#262C53;">LIVE</div>
+        </div>
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:4px;">
+          <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; color:#6C6F85; text-transform:uppercase;">Schemes on Track</div>
+          <div style="display:flex; align-items:baseline; gap:10px;">
+            <div style="font-size:62px; line-height:1; font-weight:700; color:#262C53; font-variant-numeric:tabular-nums;">{{ greenCount }}</div>
+            <div style="font-size:22px; font-weight:600; color:#6C6F85;">of {{ liveCount }}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; font-size:12px; color:#6C6F85; margin-top:2px;">
+            <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:8px; height:8px; border-radius:50%; background:#3FA76A;"></span>{{ greenCount }} Green</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:8px; height:8px; border-radius:50%; background:#E0A02B;"></span>{{ amberCount }} Amber</span>
+            <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:8px; height:8px; border-radius:50%; background:#C9472B;"></span>{{ redCount }} Red</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI B — Live Backlog -->
+      <div style="background:#FFFFFF; border:1px solid #E6E8F0; border-radius:12px; box-shadow:0 1px 2px rgba(38,44,83,0.06); padding:18px 24px; display:flex; flex-direction:column; justify-content:center; gap:6px; position:relative; box-sizing:border-box;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; color:#6C6F85; text-transform:uppercase;">Live Backlog</div>
+        <div style="display:flex; align-items:baseline; gap:8px;">
+          <div style="font-size:14px; color:#6C6F85; font-weight:600;">£</div>
+          <div style="font-size:62px; line-height:1; font-weight:700; color:#262C53; font-variant-numeric:tabular-nums; letter-spacing:-0.01em;">{{ liveBacklogFmt }}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+          <span style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:600; color:#3FA76A;">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 1 L9 7 L1 7 Z" fill="currentColor"/></svg>
+            £42,000
+          </span>
+          <span style="font-size:12px; color:#6C6F85;">vs last week</span>
+        </div>
+        <div style="position:absolute; right:18px; top:18px; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+          <div style="font-size:10px; letter-spacing:0.12em; color:#6C6F85; text-transform:uppercase;">BB-ENG slice</div>
+          <div style="font-size:11px; color:#6C6F85; font-variant-numeric:tabular-nums;">across 6 schemes</div>
+        </div>
+      </div>
+
+      <!-- KPI C — Pipeline -->
+      <div style="background:#FFFFFF; border:1px solid #E6E8F0; border-radius:12px; box-shadow:0 1px 2px rgba(38,44,83,0.06); padding:18px 24px; display:flex; flex-direction:column; justify-content:center; gap:6px; position:relative; box-sizing:border-box;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.14em; color:#6C6F85; text-transform:uppercase;">Pipeline</div>
+        <div style="display:flex; align-items:baseline; gap:8px;">
+          <div style="font-size:14px; color:#6C6F85; font-weight:600;">£</div>
+          <div style="font-size:62px; line-height:1; font-weight:700; color:#262C53; font-variant-numeric:tabular-nums; letter-spacing:-0.01em;">{{ pipelineFmt }}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+          <span style="font-size:12px; color:#6C6F85;">Weighted</span>
+          <span style="font-size:12px; font-weight:700; color:#262C53; font-variant-numeric:tabular-nums;">£{{ pipelineWeightedFmt }}</span>
+        </div>
+        <div style="position:absolute; right:18px; top:18px; display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+          <div style="font-size:10px; letter-spacing:0.12em; color:#6C6F85; text-transform:uppercase;">8 opportunities</div>
+          <div style="font-size:11px; color:#6C6F85;">probability-weighted</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- MAIN CHARTS -->
+    <section style="flex:1 1 auto; display:grid; grid-template-columns:1fr 1fr; gap:16px; min-height:0;">
+
+      <!-- Chart 1 — Spend vs Duration -->
+      <div key="c1-{{ currentCode }}" style="background:#FFFFFF; border:1px solid #E6E8F0; border-radius:12px; box-shadow:0 1px 2px rgba(38,44,83,0.06); padding:20px 22px 18px; box-sizing:border-box; display:flex; flex-direction:column; min-height:0; animation:dashFade 360ms ease-out;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px;">
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="font-size:18px; font-weight:700; color:#262C53;">Spend vs Duration</div>
+              <div style="font-size:11px; font-weight:600; letter-spacing:0.1em; color:#6C6F85; text-transform:uppercase;">S-curve</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:#6C6F85;">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#262C53; background:#F0F2F8; padding:2px 8px; border-radius:4px;">{{ currentCode }}</span>
+              <span style="font-weight:600; color:#202124;">{{ currentName }}</span>
+              <span style="color:#6C6F85;">· Lead {{ currentLead }}</span>
+            </div>
+          </div>
+          {{ variancePill }}
+        </div>
+        <div style="flex:1 1 auto; min-height:0; margin-top:10px;">{{ chart1Svg }}</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px;">
+          <div style="display:flex; align-items:center; gap:18px; font-size:12px; color:#6C6F85;">
+            <span style="display:inline-flex; align-items:center; gap:6px;"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="#2F43C5" stroke-width="2.5"/></svg>Planned</span>
+            <span style="display:inline-flex; align-items:center; gap:6px;"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="#262C53" stroke-width="2.5" stroke-dasharray="5 3"/></svg>Actual</span>
+            <span style="display:inline-flex; align-items:center; gap:6px;"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="#2F43C5" stroke-width="2.5" stroke-dasharray="2 3" opacity="0.6"/></svg>Forecast</span>
+          </div>
+          <div style="font-size:11px; color:#6C6F85; font-variant-numeric:tabular-nums;">Slice £{{ currentSliceFmt }} · planned end {{ currentPlannedEndFmt }}</div>
+        </div>
+      </div>
+
+      <!-- Chart 2 — Spend vs Work Done -->
+      <div key="c2-{{ currentCode }}" style="background:#FFFFFF; border:1px solid #E6E8F0; border-radius:12px; box-shadow:0 1px 2px rgba(38,44,83,0.06); padding:20px 22px 18px; box-sizing:border-box; display:flex; flex-direction:column; min-height:0; animation:dashFade 360ms ease-out;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px;">
+          <div style="display:flex; flex-direction:column; gap:4px; min-width:0;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="font-size:18px; font-weight:700; color:#262C53;">Spend vs Work Done</div>
+              <div style="font-size:11px; font-weight:600; letter-spacing:0.1em; color:#6C6F85; text-transform:uppercase;">Cost-performance</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; font-size:13px; color:#6C6F85;">
+              <span style="font-family:'JetBrains Mono', monospace; font-size:12px; color:#262C53; background:#F0F2F8; padding:2px 8px; border-radius:4px;">{{ currentCode }}</span>
+              <span style="font-weight:600; color:#202124;">{{ currentName }}</span>
+              <span style="color:#6C6F85;">· {{ currentPctFmt }} complete</span>
+            </div>
+          </div>
+          {{ cpPill }}
+        </div>
+        <div style="flex:1 1 auto; min-height:0; margin-top:10px;">{{ chart2Svg }}</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px;">
+          <div style="display:flex; align-items:center; gap:18px; font-size:12px; color:#6C6F85;">
+            <span style="display:inline-flex; align-items:center; gap:6px;"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="#2F43C5" stroke-width="2.5"/></svg>Ideal</span>
+            <span style="display:inline-flex; align-items:center; gap:6px;"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="#262C53" stroke-width="2.5" stroke-dasharray="5 3"/></svg>Weekly actual</span>
+            <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:8px; height:8px; border:2px solid #262C53; border-radius:50%; background:#FFFFFF;"></span>Today</span>
+          </div>
+          <div style="font-size:11px; color:#6C6F85; font-style:italic;">Above ideal = spending faster than progress · below = behind on cost capture</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- LIVE SCHEMES RIBBON -->
+    <section style="flex:none; height:220px; display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; padding:0 2px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="font-size:13px; font-weight:700; color:#262C53; letter-spacing:0.06em; text-transform:uppercase;">Live Schemes</div>
+          <div style="font-size:11px; color:#6C6F85;">Cycling every 10 s · scheme {{ cycleIndexFmt }} of {{ liveCount }}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <sc-for list="{{ cycleDots }}" as="dot" hint-placeholder-count="6">
+            <div style="width:18px; height:3px; border-radius:2px; background:{{ dot.bg }};"></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex:1 1 auto; display:grid; grid-template-columns:repeat(6, 1fr); gap:12px; min-height:0;">
+        <sc-for list="{{ ribbonCards }}" as="s" hint-placeholder-count="6">
+          <div style="position:relative; background:#FFFFFF; border:1px solid {{ s.borderColor }}; border-radius:12px; box-shadow:{{ s.shadow }}; padding:14px 16px 12px; display:flex; flex-direction:column; justify-content:space-between; box-sizing:border-box; transform:{{ s.scale }}; transition:transform 280ms ease, border-color 280ms ease, box-shadow 280ms ease; min-width:0;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div style="font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:500; color:#6C6F85; letter-spacing:0.04em;">{{ s.code }}</div>
+                  <div style="font-size:10px; color:#6C6F85; padding:1px 6px; border:1px solid #E6E8F0; border-radius:999px;">{{ s.sector }}</div>
+                </div>
+                <div style="font-size:15px; font-weight:700; color:#262C53; line-height:1.25; margin-top:5px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">{{ s.name }}</div>
+              </div>
+              <div style="flex:none; width:30px; height:30px; border-radius:50%; background:{{ s.initialsBg }}; color:{{ s.initialsFg }}; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;">{{ s.initials }}</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="font-size:11px; color:#6C6F85; letter-spacing:0.06em; text-transform:uppercase; font-weight:600;">Progress</div>
+                <div style="font-size:14px; font-weight:700; color:#262C53; font-variant-numeric:tabular-nums;">{{ s.pctFmt }}</div>
+              </div>
+              <div style="height:6px; background:#EEF0F7; border-radius:3px; overflow:hidden;">
+                <div style="height:100%; width:{{ s.pctFmt }}; background:#2F43C5; border-radius:3px;"></div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="font-size:11px; color:#6C6F85; font-variant-numeric:tabular-nums;">£{{ s.sliceFmt }} · {{ s.lead }}</div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                  <span style="width:9px; height:9px; border-radius:50%; background:{{ s.ragColor }};"></span>
+                  <span style="font-size:11px; font-weight:700; color:{{ s.ragColor }}; letter-spacing:0.04em;">{{ s.rag }}</span>
+                </div>
+              </div>
+            </div>
+            <sc-if value="{{ s.isCurrent }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:10px; right:10px; width:6px; height:6px; border-radius:50%; background:#2F43C5; box-shadow:0 0 0 4px rgba(47,67,197,0.18);"></div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ───────────────────────── FOOTER ───────────────────────── -->
+  <footer style="flex:none; height:68px; background:#262C53; display:flex; align-items:center; padding:0 32px; color:#FFFFFF; box-sizing:border-box; gap:24px;">
+    <div style="display:flex; align-items:center; gap:28px;">
+      <div style="display:flex; align-items:baseline; gap:8px;">
+        <div style="font-size:28px; font-weight:700; font-variant-numeric:tabular-nums;">6</div>
+        <div style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.7);">Live</div>
+      </div>
+      <div style="width:1px; height:28px; background:rgba(255,255,255,0.18);"></div>
+      <div style="display:flex; align-items:baseline; gap:8px;">
+        <div style="font-size:28px; font-weight:700; font-variant-numeric:tabular-nums;">8</div>
+        <div style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.7);">Pipeline</div>
+      </div>
+      <div style="width:1px; height:28px; background:rgba(255,255,255,0.18);"></div>
+      <div style="display:flex; align-items:baseline; gap:8px;">
+        <div style="font-size:28px; font-weight:700; font-variant-numeric:tabular-nums;">8</div>
+        <div style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.7);">Archived</div>
+      </div>
+    </div>
+    <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px; min-width:0;">
+      <div style="width:6px; height:6px; border-radius:50%; background:#3FA76A; flex:none;"></div>
+      <div style="font-size:13px; color:rgba(255,255,255,0.92); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ticker }}</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:18px; flex:none;">
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+        <div style="font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.6);">Pipeline value</div>
+        <div style="font-size:16px; font-weight:700; font-variant-numeric:tabular-nums;">£3,310,000</div>
+      </div>
+      <div style="width:1px; height:28px; background:rgba(255,255,255,0.18);"></div>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+        <div style="font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.6);">Next refresh</div>
+        <div style="font-size:13px; font-variant-numeric:tabular-nums; color:rgba(255,255,255,0.92);">{{ nextRefresh }}</div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1920, &quot;height&quot;: 1080}}">
+class Component extends DCLogic {
+  state = { idx: 0, refreshSecs: 23*60 + 42 };
+
+  componentDidMount() {
+    this._cycle = setInterval(() => {
+      this.setState(s => ({ idx: (s.idx + 1) % this.schemes().length }));
+    }, 10000);
+    this._tick = setInterval(() => {
+      this.setState(s => ({ refreshSecs: s.refreshSecs > 0 ? s.refreshSecs - 1 : 15*60 }));
+    }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this._cycle);
+    clearInterval(this._tick);
+  }
+
+  schemes() {
+    // Today: 15 June 2026
+    return [
+      { code:'BB1674-1', name:'Milne Graden Footbridge', lead:'Michael Pach', initials:'MP', sector:'Footbridge',
+        start:'2026-01-15', plannedEnd:'2026-09-30', forecastEnd:'2026-10-15',
+        slice:72000, actualToDate:46800, pct:0.62, rag:'Green',
+        schedVarDays:15, spendVarGbp:1200 },
+      { code:'BB1740', name:'Daresbury Sci Park Link Bridge', lead:'Adrian Brown', initials:'AB', sector:'Highway',
+        start:'2026-02-01', plannedEnd:'2026-10-30', forecastEnd:'2026-11-15',
+        slice:95000, actualToDate:39800, pct:0.41, rag:'Green',
+        schedVarDays:16, spendVarGbp:-1800 },
+      { code:'BB1777', name:'Duke of Northumberland Crossing', lead:'Matt Collins', initials:'MC', sector:'Highway',
+        start:'2025-10-01', plannedEnd:'2026-12-20', forecastEnd:'2027-02-28',
+        slice:240000, actualToDate:98400, pct:0.35, rag:'Amber',
+        schedVarDays:70, spendVarGbp:-4200 },
+      { code:'BB1812', name:'Leominster Town Centre Bridge', lead:'Michael Pach', initials:'MP', sector:'Highway',
+        start:'2025-11-15', plannedEnd:'2026-09-15', forecastEnd:'2026-09-30',
+        slice:145000, actualToDate:118900, pct:0.78, rag:'Green',
+        schedVarDays:15, spendVarGbp:2400 },
+      { code:'BB1829', name:'Loch Kemp Hydro Access Bridge', lead:'Stuart Gray', initials:'SG', sector:'Marine',
+        start:'2026-03-01', plannedEnd:'2026-11-30', forecastEnd:'2026-12-15',
+        slice:115000, actualToDate:28600, pct:0.28, rag:'Green',
+        schedVarDays:15, spendVarGbp:-900 },
+      { code:'Q007510', name:'Hedon Bridge Refurbishment', lead:'Michael Pach', initials:'MP', sector:'Refurb',
+        start:'2026-05-15', plannedEnd:'2026-12-15', forecastEnd:'2026-12-20',
+        slice:68000, actualToDate:4900, pct:0.08, rag:'Green',
+        schedVarDays:5, spendVarGbp:300 },
+    ];
+  }
+
+  RAG = { Green:'#3FA76A', Amber:'#E0A02B', Red:'#C9472B' };
+  TODAY = new Date(2026, 5, 15); // June 15 2026
+
+  fmtMoney(n) { return Math.round(n).toLocaleString('en-GB'); }
+  fmtMoneyAxis(n) {
+    if (n >= 1e6) return '£' + (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+    if (n >= 1000) return '£' + Math.round(n/1000) + 'k';
+    return '£' + n;
+  }
+  fmtDateShort(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-GB',{day:'numeric', month:'short', year:'2-digit'});
+  }
+  fmtMonthShort(d) {
+    return d.toLocaleDateString('en-GB',{month:'short'}).toUpperCase() + ' ' + String(d.getFullYear()).slice(2);
+  }
+
+  // Build planned curve (cumulative £) by month from start→plannedEnd, front-loaded design profile.
+  plannedCurve(s) {
+    const profile = [0, 0.05, 0.15, 0.30, 0.50, 0.65, 0.78, 0.88, 0.95, 1.00];
+    const start = new Date(s.start);
+    const end = new Date(s.plannedEnd);
+    const months = Math.max(1, (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()));
+    const points = [];
+    for (let i = 0; i <= months; i++) {
+      const t = i / months;
+      // interpolate profile at t
+      const ix = t * (profile.length - 1);
+      const lo = Math.floor(ix), hi = Math.min(profile.length-1, lo+1);
+      const frac = ix - lo;
+      const cum = (profile[lo] + (profile[hi]-profile[lo]) * frac) * s.slice;
+      const d = new Date(start.getFullYear(), start.getMonth()+i, 1);
+      points.push({ date:d, cum });
+    }
+    return points;
+  }
+
+  // Actual curve from start → today, ending at actualToDate.
+  actualCurve(s) {
+    const start = new Date(s.start);
+    const months = Math.max(1, (this.TODAY.getFullYear() - start.getFullYear()) * 12 + (this.TODAY.getMonth() - start.getMonth()));
+    const points = [];
+    // S-shape ramp toward actualToDate; slight under/over per scheme
+    for (let i = 0; i <= months; i++) {
+      const t = i / months;
+      // smoother S
+      const eased = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+      const cum = eased * s.actualToDate;
+      const d = new Date(start.getFullYear(), start.getMonth()+i, 1);
+      points.push({ date:d, cum });
+    }
+    // Anchor end exactly to today
+    points.push({ date:new Date(this.TODAY), cum:s.actualToDate });
+    return points;
+  }
+
+  // Forecast: straight line from today → forecast end at slice value
+  forecastSegment(s) {
+    return [
+      { date:new Date(this.TODAY), cum:s.actualToDate },
+      { date:new Date(s.forecastEnd), cum:s.slice }
+    ];
+  }
+
+  // Weekly cost-performance points (pct_complete, cum_gbp). 10 weekly snapshots back from today.
+  weeklyPoints(s) {
+    const n = 10;
+    const out = [];
+    // schemes vary in cost-performance characteristic:
+    //  - Duke (Amber): tracks below ideal early then climbs - under-billed
+    //  - Leominster: slight overspend (above ideal)
+    //  - Loch Kemp / Hedon: too early for many points
+    const pts = Math.min(n, Math.max(2, Math.round(s.pct * 20)));
+    for (let i = 0; i < pts; i++) {
+      const t = (i+1) / pts;
+      const pct = s.pct * t;
+      // map pct → expected ideal cum, then offset by characteristic
+      const ideal = pct * s.slice;
+      let actual;
+      if (s.code === 'BB1777') {
+        // under-spend (below ideal) - cost under-captured
+        actual = ideal * (0.78 + 0.08 * t);
+      } else if (s.code === 'BB1812') {
+        // overspend slightly
+        actual = ideal * (1.06 + 0.04 * Math.sin(i));
+      } else if (s.code === 'BB1740') {
+        actual = ideal * (1.02 - 0.02 * Math.sin(i*1.3));
+      } else {
+        actual = ideal * (0.96 + 0.04 * Math.sin(i*0.8));
+      }
+      out.push({ pct, cum:actual });
+    }
+    // ensure last point matches actualToDate / pct
+    if (out.length) {
+      out[out.length-1] = { pct: s.pct, cum: s.actualToDate };
+    }
+    return out;
+  }
+
+  // ─── SVG: Chart 1 (Spend vs Duration) ───
+  buildChart1Svg(s) {
+    const W = 880, H = 400;
+    const M = { l:64, r:24, t:18, b:32 };
+    const planned = this.plannedCurve(s);
+    const actual  = this.actualCurve(s);
+    const forecast= this.forecastSegment(s);
+
+    const tStart = new Date(s.start).getTime();
+    const tPlannedEnd = new Date(s.plannedEnd).getTime();
+    const tForecastEnd = new Date(s.forecastEnd).getTime();
+    const tEnd = Math.max(tPlannedEnd, tForecastEnd);
+    const yMax = Math.max(s.slice, planned[planned.length-1].cum, s.slice) * 1.08;
+
+    const x = t => M.l + (W - M.l - M.r) * (t - tStart) / (tEnd - tStart);
+    const y = v => H - M.b - (H - M.t - M.b) * (v / yMax);
+
+    const path = (points) => points.map((p,i) => (i===0?'M':'L') + x(p.date.getTime()).toFixed(1) + ' ' + y(p.cum).toFixed(1)).join(' ');
+
+    // Y ticks
+    const yTicks = 5;
+    const yStep = yMax / yTicks;
+    const yTickEls = [];
+    for (let i = 0; i <= yTicks; i++) {
+      const v = i * yStep;
+      yTickEls.push(React.createElement('g', { key:'y'+i },
+        React.createElement('line', { x1:M.l, y1:y(v), x2:W-M.r, y2:y(v), stroke:'#262C53', strokeOpacity:0.10, strokeDasharray:'2 4' }),
+        React.createElement('text', { x:M.l-10, y:y(v)+4, textAnchor:'end', fontSize:11, fill:'#6C6F85' }, this.fmtMoneyAxis(v))
+      ));
+    }
+
+    // X month ticks (every month for short projects, every 2-3 months for long)
+    const months = Math.round((tEnd - tStart) / (1000*60*60*24*30.4));
+    const xTickStep = months > 14 ? 3 : (months > 8 ? 2 : 1);
+    const xTickEls = [];
+    const start = new Date(s.start);
+    for (let i = 0; i <= months; i += xTickStep) {
+      const d = new Date(start.getFullYear(), start.getMonth()+i, 1);
+      const xp = x(d.getTime());
+      xTickEls.push(React.createElement('g', { key:'x'+i },
+        React.createElement('line', { x1:xp, y1:H-M.b, x2:xp, y2:H-M.b+4, stroke:'#6C6F85', strokeOpacity:0.5 }),
+        React.createElement('text', { x:xp, y:H-M.b+18, textAnchor:'middle', fontSize:11, fill:'#6C6F85' }, this.fmtMonthShort(d))
+      ));
+    }
+
+    const todayX = x(this.TODAY.getTime());
+    const plannedEndX = x(tPlannedEnd);
+
+    return React.createElement('svg', {
+      viewBox:`0 0 ${W} ${H}`, width:'100%', height:'100%', preserveAspectRatio:'none',
+      style:{display:'block'}
+    },
+      // axes
+      React.createElement('line', { x1:M.l, y1:M.t, x2:M.l, y2:H-M.b, stroke:'#262C53', strokeOpacity:0.35 }),
+      React.createElement('line', { x1:M.l, y1:H-M.b, x2:W-M.r, y2:H-M.b, stroke:'#262C53', strokeOpacity:0.35 }),
+      ...yTickEls,
+      ...xTickEls,
+      // planned-end vertical
+      React.createElement('line', { x1:plannedEndX, y1:M.t, x2:plannedEndX, y2:H-M.b, stroke:'#6C6F85', strokeOpacity:0.35, strokeDasharray:'3 4' }),
+      React.createElement('text', { x:plannedEndX, y:M.t+10, textAnchor:'middle', fontSize:10, fill:'#6C6F85', letterSpacing:'0.06em' }, 'PLANNED END'),
+      // planned line
+      React.createElement('path', { d:path(planned), fill:'none', stroke:'#2F43C5', strokeWidth:2.5 }),
+      // actual line
+      React.createElement('path', { d:path(actual), fill:'none', stroke:'#262C53', strokeWidth:2.5, strokeDasharray:'6 4' }),
+      // forecast
+      React.createElement('path', { d:path(forecast), fill:'none', stroke:'#2F43C5', strokeWidth:2.5, strokeDasharray:'2 4', opacity:0.65 }),
+      // today marker
+      React.createElement('line', { x1:todayX, y1:M.t, x2:todayX, y2:H-M.b, stroke:'#262C53', strokeWidth:1.5 }),
+      React.createElement('rect', { x:todayX-22, y:M.t-2, width:44, height:18, rx:3, fill:'#262C53' }),
+      React.createElement('text', { x:todayX, y:M.t+11, textAnchor:'middle', fontSize:10, fill:'#FFFFFF', fontWeight:700, letterSpacing:'0.08em' }, 'TODAY'),
+      // current actual dot
+      React.createElement('circle', { cx:todayX, cy:y(s.actualToDate), r:5, fill:'#262C53' }),
+      React.createElement('circle', { cx:todayX, cy:y(s.actualToDate), r:9, fill:'none', stroke:'#262C53', strokeOpacity:0.25 })
+    );
+  }
+
+  // ─── SVG: Chart 2 (Spend vs Work Done) ───
+  buildChart2Svg(s) {
+    const W = 880, H = 400;
+    const M = { l:64, r:24, t:18, b:32 };
+    const points = this.weeklyPoints(s);
+    const yMax = s.slice * 1.05;
+
+    const x = pct => M.l + (W - M.l - M.r) * pct;
+    const y = v   => H - M.b - (H - M.t - M.b) * (v / yMax);
+
+    // background bands (relative to ideal line)
+    // For each pct on x, ideal = pct*slice. Bands are y vs ideal +/- 10%, +/- 20%.
+    // Simpler: polygons.
+    const polyAbove = (mult, color, opacity) => {
+      const N = 30;
+      let pts = [];
+      for (let i = 0; i <= N; i++) { const p = i/N; pts.push([x(p), y(p*s.slice*mult)]); }
+      for (let i = N; i >= 0; i--) { const p = i/N; pts.push([x(p), y(p*s.slice)]); }
+      return React.createElement('polygon', { points: pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '), fill:color, opacity });
+    };
+    const polyBelow = (mult, color, opacity) => {
+      const N = 30;
+      let pts = [];
+      for (let i = 0; i <= N; i++) { const p = i/N; pts.push([x(p), y(p*s.slice)]); }
+      for (let i = N; i >= 0; i--) { const p = i/N; pts.push([x(p), y(Math.max(0, p*s.slice*mult))]); }
+      return React.createElement('polygon', { points: pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '), fill:color, opacity });
+    };
+
+    // Y ticks
+    const yTicks = 5;
+    const yStep = yMax / yTicks;
+    const yTickEls = [];
+    for (let i = 0; i <= yTicks; i++) {
+      const v = i * yStep;
+      yTickEls.push(React.createElement('g', { key:'y'+i },
+        React.createElement('line', { x1:M.l, y1:y(v), x2:W-M.r, y2:y(v), stroke:'#262C53', strokeOpacity:0.10, strokeDasharray:'2 4' }),
+        React.createElement('text', { x:M.l-10, y:y(v)+4, textAnchor:'end', fontSize:11, fill:'#6C6F85' }, this.fmtMoneyAxis(v))
+      ));
+    }
+    // X ticks (0,25,50,75,100)
+    const xTickEls = [0,0.25,0.5,0.75,1.0].map((p,i) => React.createElement('g', { key:'x'+i },
+      React.createElement('line', { x1:x(p), y1:H-M.b, x2:x(p), y2:H-M.b+4, stroke:'#6C6F85', strokeOpacity:0.5 }),
+      React.createElement('text', { x:x(p), y:H-M.b+18, textAnchor:'middle', fontSize:11, fill:'#6C6F85' }, Math.round(p*100)+'%')
+    ));
+
+    // trace path
+    const tracePath = points.map((p,i)=>(i===0?'M':'L') + x(p.pct).toFixed(1) + ' ' + y(p.cum).toFixed(1)).join(' ');
+    const dots = points.map((p,i) => React.createElement('circle', { key:'d'+i, cx:x(p.pct), cy:y(p.cum), r:i===points.length-1?0:3, fill:'#262C53' }));
+    const last = points[points.length-1];
+
+    return React.createElement('svg', {
+      viewBox:`0 0 ${W} ${H}`, width:'100%', height:'100%', preserveAspectRatio:'none',
+      style:{display:'block'}
+    },
+      // bands: green ±10, amber 10-20, red >20
+      polyAbove(1.20, '#C9472B', 0.06),
+      polyAbove(1.10, '#E0A02B', 0.07),
+      polyAbove(1.00, '#3FA76A', 0.07), // would only overlap zero -- actually 1.00 above ideal = above slice, fine
+      polyBelow(0.90, '#E0A02B', 0.07),
+      polyBelow(0.80, '#C9472B', 0.06),
+      // green band: ±10% around ideal
+      // (handled by drawing green between 0.90 and 1.10 via two polys above)
+      // ideal line
+      React.createElement('line', { x1:x(0), y1:y(0), x2:x(1), y2:y(s.slice), stroke:'#2F43C5', strokeWidth:2.5 }),
+      React.createElement('text', { x:x(1)-4, y:y(s.slice)-8, textAnchor:'end', fontSize:10, fill:'#2F43C5', fontWeight:700, letterSpacing:'0.06em' }, 'IDEAL'),
+      // axes
+      React.createElement('line', { x1:M.l, y1:M.t, x2:M.l, y2:H-M.b, stroke:'#262C53', strokeOpacity:0.35 }),
+      React.createElement('line', { x1:M.l, y1:H-M.b, x2:W-M.r, y2:H-M.b, stroke:'#262C53', strokeOpacity:0.35 }),
+      ...yTickEls,
+      ...xTickEls,
+      // weekly trace
+      React.createElement('path', { d:tracePath, fill:'none', stroke:'#262C53', strokeWidth:2.5, strokeDasharray:'6 4' }),
+      ...dots,
+      // current marker
+      React.createElement('circle', { cx:x(last.pct), cy:y(last.cum), r:8, fill:'#FFFFFF', stroke:'#262C53', strokeWidth:2.5 }),
+      React.createElement('circle', { cx:x(last.pct), cy:y(last.cum), r:3, fill:'#262C53' }),
+      React.createElement('rect', { x:x(last.pct)+10, y:y(last.cum)-22, width:60, height:18, rx:3, fill:'#262C53' }),
+      React.createElement('text', { x:x(last.pct)+40, y:y(last.cum)-9, textAnchor:'middle', fontSize:10, fill:'#FFFFFF', fontWeight:700, letterSpacing:'0.06em' }, 'TODAY')
+    );
+  }
+
+  // ─── Donut for KPI A ───
+  buildDonutSvg(g, a, r) {
+    const total = g + a + r;
+    const W = 110, cx = W/2, cy = W/2, rr = 46, sw = 12;
+    if (total === 0) return null;
+    const arc = (frac, start, color) => {
+      const a0 = start * Math.PI * 2 - Math.PI/2;
+      const a1 = (start + frac) * Math.PI * 2 - Math.PI/2;
+      const large = frac > 0.5 ? 1 : 0;
+      const x0 = cx + rr*Math.cos(a0), y0 = cy + rr*Math.sin(a0);
+      const x1 = cx + rr*Math.cos(a1), y1 = cy + rr*Math.sin(a1);
+      return React.createElement('path', {
+        d:`M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${rr} ${rr} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`,
+        stroke:color, strokeWidth:sw, fill:'none', strokeLinecap:'butt'
+      });
+    };
+    const fg = g/total, fa = a/total, fr = r/total;
+    let cursor = 0;
+    const arcs = [];
+    if (fg > 0) { arcs.push(arc(fg, cursor, '#3FA76A')); cursor += fg; }
+    if (fa > 0) { arcs.push(arc(fa, cursor, '#E0A02B')); cursor += fa; }
+    if (fr > 0) { arcs.push(arc(fr, cursor, '#C9472B')); cursor += fr; }
+    return React.createElement('svg', { viewBox:`0 0 ${W} ${W}`, width:W, height:W, style:{display:'block'} },
+      React.createElement('circle', { cx, cy, r:rr, fill:'none', stroke:'#EEF0F7', strokeWidth:sw }),
+      ...arcs.map((el, i) => React.cloneElement(el, { key:i }))
+    );
+  }
+
+  // ─── Variance pill (Chart 1) ───
+  buildVariancePill(s) {
+    // Use worst variance per spec
+    const sliceAtPlannedRef = s.slice * 0.5; // rough planned-at-today reference
+    const spendPct = Math.abs(s.spendVarGbp) / Math.max(1, sliceAtPlannedRef);
+    const totalDur = (new Date(s.plannedEnd) - new Date(s.start)) / 86400000;
+    const schedPct = s.schedVarDays / totalDur;
+    let label, color;
+    if (s.schedVarDays > 0 && schedPct >= spendPct) {
+      label = '+' + s.schedVarDays + ' days';
+    } else {
+      const v = s.spendVarGbp;
+      label = (v >= 0 ? '+' : '−') + '£' + this.fmtMoney(Math.abs(v));
+    }
+    color = s.rag === 'Red' ? '#C9472B' : s.rag === 'Amber' ? '#E0A02B' : '#3FA76A';
+    return React.createElement('div', {
+      style:{
+        display:'flex', alignItems:'center', gap:8,
+        background: color + '1A',
+        border: '1px solid ' + color + '40',
+        color: color,
+        padding:'6px 12px', borderRadius:999, fontSize:12, fontWeight:700, letterSpacing:'0.04em',
+        whiteSpace:'nowrap', flex:'none'
+      }
+    },
+      React.createElement('span', { style:{width:8, height:8, borderRadius:'50%', background:color} }),
+      'Schedule variance ' + label
+    );
+  }
+
+  // ─── CP pill (Chart 2) ───
+  buildCpPill(s) {
+    const ideal = s.pct * s.slice;
+    const delta = s.actualToDate - ideal;
+    const pct = ideal > 0 ? delta / ideal : 0;
+    const apct = Math.abs(pct);
+    let color, label;
+    if (apct < 0.10) color = '#3FA76A';
+    else if (apct < 0.20) color = '#E0A02B';
+    else color = '#C9472B';
+    label = (pct >= 0 ? '+' : '−') + (apct*100).toFixed(1) + '% vs ideal';
+    return React.createElement('div', {
+      style:{
+        display:'flex', alignItems:'center', gap:8,
+        background: color + '1A',
+        border: '1px solid ' + color + '40',
+        color: color,
+        padding:'6px 12px', borderRadius:999, fontSize:12, fontWeight:700, letterSpacing:'0.04em',
+        whiteSpace:'nowrap', flex:'none'
+      }
+    },
+      React.createElement('span', { style:{width:8, height:8, borderRadius:'50%', background:color} }),
+      'Cost performance ' + label
+    );
+  }
+
+  renderVals() {
+    const schemes = this.schemes();
+    const cur = schemes[this.state.idx];
+
+    const greenCount = schemes.filter(s => s.rag === 'Green').length;
+    const amberCount = schemes.filter(s => s.rag === 'Amber').length;
+    const redCount   = schemes.filter(s => s.rag === 'Red').length;
+    const liveCount  = schemes.length;
+    const liveBacklog = schemes.reduce((s,x)=>s+x.slice, 0);
+
+    const pipelineGbp = 3310000;
+    const pipelineWeighted = 1471000;
+
+    // ribbon cards
+    const ribbonCards = schemes.map((s, i) => ({
+      ...s,
+      pctFmt: Math.round(s.pct * 100) + '%',
+      sliceFmt: this.fmtMoney(s.slice),
+      ragColor: this.RAG[s.rag],
+      isCurrent: i === this.state.idx,
+      borderColor: i === this.state.idx ? '#262C53' : '#E6E8F0',
+      shadow: i === this.state.idx ? '0 6px 18px rgba(38,44,83,0.10)' : '0 1px 2px rgba(38,44,83,0.06)',
+      scale: i === this.state.idx ? 'scale(1.015)' : 'scale(1)',
+      initialsBg: i === this.state.idx ? '#262C53' : '#F0F2F8',
+      initialsFg: i === this.state.idx ? '#FFFFFF' : '#262C53',
+    }));
+
+    const cycleDots = schemes.map((s, i) => ({
+      bg: i === this.state.idx ? '#262C53' : '#D7DAE5'
+    }));
+
+    // Next refresh formatting
+    const r = this.state.refreshSecs;
+    const nextRefresh = String(Math.floor(r/60)).padStart(2,'0') + ':' + String(r%60).padStart(2,'0');
+
+    return {
+      // header
+      updatedTime: '14:00',
+      updatedDate: 'Mon 15 Jun 2026',
+
+      // KPI
+      greenCount, amberCount, redCount, liveCount,
+      donutSvg: this.buildDonutSvg(greenCount, amberCount, redCount),
+      liveBacklogFmt: this.fmtMoney(liveBacklog),
+      pipelineFmt: this.fmtMoney(pipelineGbp),
+      pipelineWeightedFmt: this.fmtMoney(pipelineWeighted),
+
+      // current scheme
+      currentCode: cur.code,
+      currentName: cur.name,
+      currentLead: cur.lead,
+      currentSliceFmt: this.fmtMoney(cur.slice),
+      currentPlannedEndFmt: this.fmtDateShort(cur.plannedEnd),
+      currentPctFmt: Math.round(cur.pct * 100) + '%',
+
+      chart1Svg: this.buildChart1Svg(cur),
+      chart2Svg: this.buildChart2Svg(cur),
+      variancePill: this.buildVariancePill(cur),
+      cpPill: this.buildCpPill(cur),
+
+      // ribbon
+      ribbonCards,
+      cycleDots,
+      cycleIndexFmt: String(this.state.idx + 1).padStart(2,'0'),
+
+      // footer
+      ticker: 'Hedon Bridge commenced this week with Michael · Duke of Northumberland watch-list: Broom Lane RAMS in review · Daresbury TWD critical path on plan',
+      nextRefresh,
+    };
+  }
+}
+</script>
+</body>
+</html>
